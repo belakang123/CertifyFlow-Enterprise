@@ -1,7 +1,18 @@
 {
   "name": "certifyflow",
   "version": "0.1.0",
-  "private": true,
+  "description": "Client-side automated bulk certificate generator built with Next.js and TypeScript.",
+  "license": "MIT",
+  "keywords": [
+    "certificate",
+    "generator",
+    "bulk",
+    "csv",
+    "client-side",
+    "privacy-first",
+    "nextjs",
+    "pdf"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,18 +20,33 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "comlink": "^4.4.2",
+    "dexie": "^4.4.7",
+    "fabric": "^5.3.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.2",
+    "next": "14.2.35",
+    "papaparse": "^5.7.0",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.35"
+    "react-dropzone": "^20.1.4",
+    "uuid": "^14.0.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.35"
+    "typescript": "^5"
   }
 }

@@ -1,115 +1,141 @@
-import Image from "next/image";
-import localFont from "next/font/local";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import Head from 'next/head';
+import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <>
+      <Head>
+        <title>CertifyFlow Enterprise — Pembuat Sertifikat Massal Otomatis</title>
+        <meta name="description" content="Buat ratusan sertifikat dalam hitungan detik. Upload template, import CSV, ekspor ZIP — 100% di browser, tanpa server, privasi penuh." />
+      </Head>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <main className="hero">
+        <div className="hero-badge">🚀 Pembuat Sertifikat Otomatis Berbasis Browser</div>
+
+        <h1 className="hero-h1">
+          Buat Ribuan Sertifikat<br />
+          <span className="grad">Dalam Hitungan Detik</span>
+        </h1>
+
+        <p className="hero-p">
+          Upload template PNG/JPG, import data CSV, dan ekspor ZIP berisi ratusan sertifikat personal
+          — semua proses terjadi di browser Anda, tanpa server, 100% privasi.
+        </p>
+
+        <div className="hero-cta">
+          <Link href="/wizard" className="btn btn-primary btn-lg" id="hero-mulai-btn">
+            ✨ Mulai Buat Sertifikat
+          </Link>
+          <Link href="#cara-pakai" className="btn btn-secondary btn-lg" id="hero-cara-btn">
+            📖 Cara Penggunaan
+          </Link>
+        </div>
+
+        {/* Stats */}
+        <div className="stats-row">
+          {[
+            { v: '10.000+', l: 'Sertifikat per Batch' },
+            { v: '100%', l: 'Client-Side' },
+            { v: 'Rp 0', l: 'Biaya Server' },
+            { v: '< 5 detik', l: 'Waktu Generate' },
+          ].map(s => (
+            <div className="stat-item" key={s.l}>
+              <div className="stat-v">{s.v}</div>
+              <div className="stat-l">{s.l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Feature grid */}
+        <div className="features">
+          {[
+            { ico: '🎨', color: 'rgba(37,99,235,.12)', t: 'Visual Editor Canvas', d: 'Drag & drop posisi nama, tanggal, dan QR code langsung di atas template sertifikat.' },
+            { ico: '⚡', color: 'rgba(124,58,237,.12)', t: 'Proses Paralel Multi-thread', d: 'Memanfaatkan semua core CPU untuk memproses ratusan sertifikat per detik.' },
+            { ico: '📊', color: 'rgba(22,163,74,.12)', t: 'Import CSV Mudah', d: 'Upload file CSV, petakan kolom ke variabel, dan preview hasilnya sebelum generate.' },
+            { ico: '🔒', color: 'rgba(217,119,6,.12)', t: 'Privasi 100%', d: 'Tidak ada data yang dikirim ke server. Semua proses di RAM browser Anda.' },
+            { ico: '📦', color: 'rgba(220,38,38,.12)', t: 'Ekspor ZIP / PDF', d: 'Paket semua sertifikat ke ZIP individual atau PDF multi-halaman tunggal.' },
+            { ico: '🌐', color: 'rgba(14,165,233,.12)', t: 'Bekerja Offline', d: 'Tidak perlu internet setelah halaman dimuat. Simpan template di browser.' },
+          ].map(f => (
+            <div className="feat" key={f.t}>
+              <div className="feat-ico" style={{ background: f.color }}>{f.ico}</div>
+              <div className="feat-t">{f.t}</div>
+              <div className="feat-d">{f.d}</div>
+            </div>
+          ))}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+      {/* HOW TO USE SECTION */}
+      <section id="cara-pakai" style={{ padding: '80px 24px', background: 'var(--elevated)' }}>
+        <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 900, textAlign: 'center', letterSpacing: '-0.03em', marginBottom: '8px' }}>
+            📖 Cara Penggunaan
+          </h2>
+          <p style={{ textAlign: 'center', color: 'var(--text-2)', fontSize: '15px', marginBottom: '56px' }}>
+            Ikuti 4 langkah mudah ini untuk membuat sertifikat massal
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {[
+              {
+                n: '1', icon: '📁', title: 'Upload Template',
+                desc: 'Upload gambar template sertifikat Anda (PNG atau JPG). Template bisa dibuat di Canva, PowerPoint, atau aplikasi desain lainnya.',
+                tip: '💡 Rekomendasi: ukuran A4 landscape (3508 × 2480 px) atau A4 portrait (2480 × 3508 px)',
+                color: 'var(--primary)',
+              },
+              {
+                n: '2', icon: '🎯', title: 'Atur Posisi Elemen',
+                desc: 'Di canvas editor, klik "Tambah Nama", "Tambah Tanggal", atau "Tambah QR Code". Drag elemen ke posisi yang tepat di atas template.',
+                tip: '💡 Klik elemen untuk mengubah font, ukuran teks, dan warna di panel kanan.',
+                color: 'var(--purple)',
+              },
+              {
+                n: '3', icon: '📊', title: 'Import Data CSV',
+                desc: 'Upload file CSV berisi daftar nama penerima. Petakan kolom CSV (misal: "Nama_Peserta") ke variabel template (misal: "{{nama}}").',
+                tip: '💡 Tidak punya CSV? Gunakan tombol "Download Template CSV" untuk mendapatkan file contoh.',
+                color: 'var(--green)',
+              },
+              {
+                n: '4', icon: '⚡', title: 'Generate & Download',
+                desc: 'Pilih format ekspor (ZIP PNG, ZIP PDF, atau PDF tunggal), lalu klik "Mulai Generate". Semua sertifikat akan diproses dan dikemas otomatis.',
+                tip: '💡 Sertifikat 500 orang biasanya selesai dalam < 30 detik.',
+                color: 'var(--amber)',
+              },
+            ].map((s, i) => (
+              <div key={i} style={{
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: 'var(--r-xl)', padding: '24px 28px',
+                display: 'grid', gridTemplateColumns: '48px 1fr', gap: '20px', alignItems: 'start',
+              }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+                  background: `${s.color}20`, border: `2px solid ${s.color}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '22px',
+                }}>
+                  {s.icon}
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: s.color, letterSpacing: '0.1em' }}>LANGKAH {s.n}</span>
+                  </div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, marginBottom: '8px', color: 'var(--text)' }}>{s.title}</div>
+                  <div style={{ fontSize: '14px', color: 'var(--text-2)', lineHeight: 1.6, marginBottom: '10px' }}>{s.desc}</div>
+                  <div style={{ fontSize: '13px', color: 'var(--text-2)', background: 'var(--elevated)', padding: '10px 14px', borderRadius: '8px', lineHeight: 1.5 }}>
+                    {s.tip}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <Link href="/wizard" className="btn btn-primary btn-lg" id="howto-cta-btn">
+              ✨ Coba Sekarang — Gratis!
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
