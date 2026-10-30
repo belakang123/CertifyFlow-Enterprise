@@ -15,6 +15,14 @@
 
 </div>
 
+<div align="center">
+  <img src="./assets/preview.png" alt="CertifyFlow Preview" width="100%" />
+</div>
+
+<div align="center">
+  <img src="./assets/Wizard.png" alt="CertifyFlow Preview" width="100%" />
+</div>
+
 ---
 
 ## 🌟 Fitur Utama
