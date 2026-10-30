@@ -65,6 +65,17 @@ Buka **[http://localhost:3000](http://localhost:3000)** di browser Anda.
 
 ---
 
+## 🚀 Deploy ke Vercel
+
+1. Push repository ke GitHub, lalu import repository tersebut di [Vercel](https://vercel.com/new).
+2. Biarkan framework preset **Next.js** dan build command default (`npm run build`).
+3. (Disarankan) Tambahkan environment variable `NEXT_PUBLIC_SITE_URL` dengan URL produksi, misalnya `https://certifyflow.example.com`, untuk semua environment yang akan dipakai.
+4. Deploy. Build akan menghasilkan static site di folder `out`, termasuk `robots.txt` dan `sitemap.xml`.
+
+Tanpa `NEXT_PUBLIC_SITE_URL`, build Vercel menggunakan URL produksi/proyek Vercel yang tersedia. Untuk build lokal tanpa URL, situs tetap bisa dibangun, tetapi sitemap tidak dihasilkan sampai URL dikonfigurasi.
+
+---
+
 ## 📖 Cara Penggunaan (4 Langkah Mudah)
 
 Akses menu **Buat Sertifikat** atau buka **[http://localhost:3000/wizard](http://localhost:3000/wizard)**:

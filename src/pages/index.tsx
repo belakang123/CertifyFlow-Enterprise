@@ -1,5 +1,6 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { getSiteUrl } from '@/lib/site';
 import {
   RocketIcon,
   SparklesIcon,
@@ -16,6 +17,24 @@ import {
 } from '@/components/Icons';
 
 export default function Home() {
+  const siteUrl = getSiteUrl();
+  const description = 'Buat sertifikat massal otomatis: desain dengan editor visual, impor data CSV, lalu unduh PDF atau ZIP. Gratis, privat, dan diproses langsung di browser.';
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    name: 'CertifyFlow',
+    description,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    inLanguage: 'id-ID',
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'IDR',
+    },
+    ...(siteUrl ? { url: siteUrl } : {}),
+  };
+
   const features = [
     {
       icon: <PaletteIcon size={24} color="#2563eb" />,
@@ -93,8 +112,24 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>CertifyFlow Enterprise — Pembuat Sertifikat Massal Otomatis</title>
-        <meta name="description" content="Buat ratusan sertifikat dalam hitungan detik. Upload template, import CSV, ekspor ZIP — 100% di browser, tanpa server, privasi penuh." />
+        <title>Pembuat Sertifikat Massal Otomatis Gratis | CertifyFlow</title>
+        <meta name="description" content={description} />
+        <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#2563eb" />
+        <meta property="og:type" content="website" />
+        <meta property="og:locale" content="id_ID" />
+        <meta property="og:site_name" content="CertifyFlow" />
+        <meta property="og:title" content="Pembuat Sertifikat Massal Otomatis Gratis | CertifyFlow" />
+        <meta property="og:description" content={description} />
+        {siteUrl && <link rel="canonical" href={siteUrl} />}
+        {siteUrl && <meta property="og:url" content={siteUrl} />}
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Pembuat Sertifikat Massal Otomatis Gratis | CertifyFlow" />
+        <meta name="twitter:description" content={description} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }}
+        />
       </Head>
 
       <main className="hero">

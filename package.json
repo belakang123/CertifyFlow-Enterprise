@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/generate-seo-files.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"

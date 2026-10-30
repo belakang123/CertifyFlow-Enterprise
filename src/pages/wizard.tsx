@@ -412,13 +412,10 @@ export default function WizardPage() {
 
   // Step 1: Template
   const [tplSrc, setTplSrc]         = useState<string | null>(null);
-  const [tplBlob, setTplBlob]       = useState<Blob | null>(null);
   const [tplName, setTplName]       = useState('');
   const [tplDim, setTplDim]         = useState({ w: 1200, h: 850 });
   const [tplId, setTplId]           = useState<string>('');    // ID persisten di IndexedDB
-  const [tplSaved, setTplSaved]     = useState(false);         // feedback UI simpan
   const [savedTemplates, setSavedTemplates] = useState<Template[]>([]);
-  const [loadingTemplates, setLoadingTemplates] = useState(false);
   const fileRef                     = useRef<HTMLInputElement>(null);
 
   // Step 2: Canvas
@@ -432,13 +429,10 @@ export default function WizardPage() {
   // Memuat daftar template tersimpan dari IndexedDB
   const loadSavedTemplates = useCallback(async () => {
     try {
-      setLoadingTemplates(true);
       const list = await db.templates.orderBy('createdAt').reverse().toArray();
       setSavedTemplates(list);
     } catch (err) {
       console.warn('[CertifyFlow] Gagal memuat template tersimpan:', err);
-    } finally {
-      setLoadingTemplates(false);
     }
   }, []);
 
@@ -446,11 +440,9 @@ export default function WizardPage() {
   const selectTemplate = useCallback(async (t: Template) => {
     const url = URL.createObjectURL(t.fileBlob);
     setTplSrc(url);
-    setTplBlob(t.fileBlob);
     setTplName(t.name);
     setTplDim({ w: t.dimensions.width, h: t.dimensions.height });
     setTplId(t.id);
-    setTplSaved(true);
     setManualScale(false);
 
     // Coba restore layout config jika sebelumnya ada
@@ -557,9 +549,8 @@ export default function WizardPage() {
   const handleTplFile = (file: File) => {
     if (!file) return;
     const url = URL.createObjectURL(file);
-    setTplSrc(url); setTplBlob(file); setTplName(file.name);
+    setTplSrc(url); setTplName(file.name);
     setManualScale(false);
-    setTplSaved(false);
 
     if (file.type.startsWith('image/')) {
       const img = new Image();
@@ -584,7 +575,6 @@ export default function WizardPage() {
             },
             createdAt: Date.now(),
           });
-          setTplSaved(true);
           console.log('[CertifyFlow] Template tersimpan ke IndexedDB:', id);
           loadSavedTemplates();
         } catch (err) {
@@ -831,7 +821,10 @@ export default function WizardPage() {
   if (step === 2) {
     return (
       <>
-        <Head><title>Editor Canvas — CertifyFlow Enterprise</title></Head>
+        <Head>
+          <title>Editor Canvas — CertifyFlow Enterprise</title>
+          <meta name="robots" content="noindex, nofollow" />
+        </Head>
 
         {/* Top Chrome Bar */}
         <div style={{
@@ -1015,6 +1008,7 @@ export default function WizardPage() {
       <Head>
         <title>Wizard Pembuatan Sertifikat — CertifyFlow Enterprise</title>
         <meta name="description" content="Buat sertifikat massal dalam 4 langkah mudah: upload template, atur posisi, import CSV, generate ZIP." />
+        <meta name="robots" content="noindex, nofollow" />
       </Head>
 
       <div className="wiz-layout">
@@ -1147,7 +1141,7 @@ export default function WizardPage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
                       <button id="change-tpl-btn" className="btn btn-secondary" onClick={() => {
-                        setTplSrc(null); setTplBlob(null); setTplName(''); setTplId('');
+                        setTplSrc(null); setTplName(''); setTplId('');
                       }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                         <RefreshCwIcon size={14} />
                         Ganti / Pilih Lain
@@ -1156,7 +1150,7 @@ export default function WizardPage() {
                         <UploadCloudIcon size={14} />
                         Upload Gambar Baru
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => { setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <button className="btn btn-ghost btn-sm" onClick={() => { setTplSrc(null); setTplName(''); setTplId(''); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                         <TrashIcon size={14} />
                         Hapus
                       </button>
@@ -1466,7 +1460,7 @@ export default function WizardPage() {
                 )}
               </div>
               {prog.status === 'done' && (
-                <button className="btn btn-secondary" onClick={() => { setStep(1); setEls([]); setCsvRows([]); setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); setProg(p => ({ ...p, status: 'idle', logs: [], done: 0 })); setZipBlob(null); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <button className="btn btn-secondary" onClick={() => { setStep(1); setEls([]); setCsvRows([]); setTplSrc(null); setTplName(''); setTplId(''); setProg(p => ({ ...p, status: 'idle', logs: [], done: 0 })); setZipBlob(null); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                   <RefreshCwIcon size={15} />
                   Buat Batch Baru
                 </button>

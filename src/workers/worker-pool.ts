@@ -5,7 +5,7 @@
 */
 
 import type { WorkerTask, WorkerResult } from '@/types/worker';
-import type { BatchConfig, GenerationProgress, ExportFormat } from '@/types/certificate';
+import type { BatchConfig, GenerationProgress } from '@/types/certificate';
 import { getWorkerCount, sanitizeFilename, applyTemplateVariables } from '@/lib/utils';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -85,14 +85,11 @@ export class WorkerPoolManager {
     const completedAt: number[] = [];
 
     // Process with worker pool
-    const chunkSize = Math.ceil(totalTasks / this.workerCount);
     const workerPromises: Promise<void>[] = [];
 
     for (let i = 0; i < this.workerCount && i < totalTasks; i++) {
       const workerTasks = tasks.filter((t) => t.workerIndex === i);
       if (workerTasks.length === 0) continue;
-
-      const workerScript = isPdf ? '/workers/pdf-worker.js' : '/workers/image-worker.js';
 
       const promise = new Promise<void>((resolve) => {
         // Inline worker fallback using Blob URL for Next.js compatibility

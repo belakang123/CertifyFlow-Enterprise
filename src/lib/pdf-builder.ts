@@ -1,7 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import type { LayoutElement, FieldMapping } from '@/types/certificate';
-import { applyTemplateVariables } from './utils';
 import { generateQRCodeDataURL } from './qrcode';
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } {

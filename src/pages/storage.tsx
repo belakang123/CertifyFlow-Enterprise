@@ -90,6 +90,7 @@ export default function StoragePage() {
       <Head>
         <title>Library — CertifyFlow Enterprise</title>
         <meta name="description" content="Kelola template dan riwayat pembuatan sertifikat." />
+        <meta name="robots" content="noindex, nofollow" />
       </Head>
 
       {/* Toast notification */}
