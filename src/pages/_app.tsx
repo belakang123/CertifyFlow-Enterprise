@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import '@/styles/globals.css';
+import { AwardIcon, HomeIcon, SparklesIcon, FolderIcon, SunIcon, MoonIcon } from '@/components/Icons';
 
 function TopNav() {
   const router = useRouter();
@@ -21,29 +22,36 @@ function TopNav() {
   };
 
   const links = [
-    { href: '/', label: '🏠 Beranda' },
-    { href: '/wizard', label: '✨ Buat Sertifikat' },
-    { href: '/storage', label: '🗂️ Library' },
+    { href: '/', label: 'Beranda', icon: <HomeIcon size={15} style={{ marginRight: 6 }} /> },
+    { href: '/wizard', label: 'Buat Sertifikat', icon: <SparklesIcon size={15} style={{ marginRight: 6 }} /> },
+    { href: '/storage', label: 'Library', icon: <FolderIcon size={15} style={{ marginRight: 6 }} /> },
   ];
 
   return (
     <nav className="topnav">
       <Link href="/" className="topnav-logo">
-        <div className="topnav-logo-icon">🏆</div>
+        <div className="topnav-logo-icon">
+          <AwardIcon size={19} color="#ffffff" strokeWidth={2.2} />
+        </div>
         <span className="topnav-logo-name">CertifyFlow</span>
         <span className="topnav-logo-badge">ENTERPRISE</span>
       </Link>
       <div className="topnav-spacer" />
       {links.map(l => (
         <Link key={l.href} href={l.href}
-          className={`topnav-btn ${router.pathname === l.href || (l.href === '/wizard' && router.pathname.startsWith('/wizard')) ? 'active' : ''}`}>
+          className={`topnav-btn ${router.pathname === l.href || (l.href === '/wizard' && router.pathname.startsWith('/wizard')) ? 'active' : ''}`}
+          style={{ display: 'inline-flex', alignItems: 'center' }}>
+          {l.icon}
           {l.label}
         </Link>
       ))}
-      <button className="theme-btn" onClick={toggle} id="theme-toggle" title="Ganti tema">
-        {dark ? '☀️' : '🌙'}
+      <button className="theme-btn" onClick={toggle} id="theme-toggle" title="Ganti tema" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {dark ? <SunIcon size={17} /> : <MoonIcon size={17} />}
       </button>
-      <Link href="/wizard" className="btn btn-primary btn-sm" id="nav-buat-btn">✨ Buat Sekarang</Link>
+      <Link href="/wizard" className="btn btn-primary btn-sm" id="nav-buat-btn" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <SparklesIcon size={14} />
+        Buat Sekarang
+      </Link>
     </nav>
   );
 }

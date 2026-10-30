@@ -81,7 +81,7 @@ self.onmessage = async (event: MessageEvent<WorkerTask>) => {
       renderTimeMs,
     };
 
-    self.postMessage(result, []);
+    self.postMessage(result);
   } catch (error) {
     const result: WorkerResult = {
       taskId: task.taskId,
@@ -90,6 +90,6 @@ self.onmessage = async (event: MessageEvent<WorkerTask>) => {
       error: error instanceof Error ? error.message : String(error),
       renderTimeMs: performance.now() - startTime,
     };
-    self.postMessage(result, []);
+    self.postMessage(result);
   }
 };

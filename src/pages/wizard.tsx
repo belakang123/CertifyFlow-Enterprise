@@ -8,6 +8,38 @@ import { saveAs } from 'file-saver';
 import { v4 as uuid } from 'uuid';
 import { db } from '@/db';
 import type { Template } from '@/types/certificate';
+import {
+  ImageIcon,
+  TypeIcon,
+  CalendarIcon,
+  HashIcon,
+  QrCodeIcon,
+  Edit3Icon,
+  EyeIcon,
+  TrashIcon,
+  TargetIcon,
+  SparklesIcon,
+  FolderIcon,
+  BarChartIcon,
+  ZapIcon,
+  UploadCloudIcon,
+  DownloadIcon,
+  RefreshCwIcon,
+  CheckCircleIcon,
+  CheckIcon,
+  AlertTriangleIcon,
+  XCircleIcon,
+  StopCircleIcon,
+  TerminalIcon,
+  PackageIcon,
+  FileTextIcon,
+  FilesIcon,
+  HelpCircleIcon,
+  LightbulbIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+} from '@/components/Icons';
 
 // Komponen thumbnail template yang mengelola lifecycle URL-nya sendiri
 function TplThumb({ blob, name }: { blob: Blob; name: string }) {
@@ -20,7 +52,9 @@ function TplThumb({ blob, name }: { blob: Blob; name: string }) {
   return src ? (
     <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
   ) : (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>🖼️</div>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <ImageIcon size={26} color="var(--text-3)" />
+    </div>
   );
 }
 
@@ -46,11 +80,11 @@ interface Progress {
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const VARS: { kind: CanvasEl['kind']; icon: string; label: string; color: string }[] = [
-  { kind: 'nama',          icon: '🔤', label: '{{nama}}',          color: '#2563eb' },
-  { kind: 'tanggal',       icon: '📅', label: '{{tanggal}}',       color: '#7c3aed' },
-  { kind: 'id_sertifikat', icon: '#️⃣', label: '{{id_sertifikat}}', color: '#059669' },
-  { kind: 'qr_code',       icon: '⬛', label: '{{qr_code}}',       color: '#d97706' },
+const VARS: { kind: CanvasEl['kind']; icon: React.ReactNode; label: string; color: string }[] = [
+  { kind: 'nama',          icon: <TypeIcon size={14} color="#2563eb" />,     label: '{{nama}}',          color: '#2563eb' },
+  { kind: 'tanggal',       icon: <CalendarIcon size={14} color="#7c3aed" />, label: '{{tanggal}}',       color: '#7c3aed' },
+  { kind: 'id_sertifikat', icon: <HashIcon size={14} color="#059669" />,     label: '{{id_sertifikat}}', color: '#059669' },
+  { kind: 'qr_code',       icon: <QrCodeIcon size={14} color="#d97706" />,   label: '{{qr_code}}',       color: '#d97706' },
 ];
 const FONTS = ['Inter','Roboto','Open Sans','Montserrat','Poppins','Playfair Display','Merriweather','Dancing Script','Great Vibes','Raleway'];
 
@@ -62,7 +96,7 @@ function StepBar({ step }: { step: number }) {
       {steps.map((s, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', flex: i < steps.length - 1 ? 1 : undefined }}>
           <div className={`wz-step ${step === i + 1 ? 'active' : step > i + 1 ? 'done' : ''}`}>
-            <div className="wz-circle">{step > i + 1 ? '✓' : i + 1}</div>
+            <div className="wz-circle">{step > i + 1 ? <CheckIcon size={14} /> : i + 1}</div>
             <div className="wz-label">{s}</div>
           </div>
           {i < steps.length - 1 && <div className={`wz-line ${step > i + 1 ? 'done' : ''}`} />}
@@ -128,7 +162,7 @@ function ElOverlay({
       {isQr ? (
         // QR placeholder
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', gap: 4 }}>
-          <span style={{ fontSize: Math.max(18, el.w * scale * 0.35) + 'px' }}>⬛</span>
+          <QrCodeIcon size={Math.max(20, el.w * scale * 0.45)} color="#111" />
           <span style={{ fontSize: Math.max(8, 10 * scale) + 'px', color: '#888', fontWeight: 600 }}>QR Code</span>
         </div>
       ) : (
@@ -163,8 +197,9 @@ function ElOverlay({
           padding: '2px 6px', borderRadius: 4,
           whiteSpace: 'nowrap', lineHeight: 1.4,
           pointerEvents: 'none',
+          display: 'flex', alignItems: 'center', gap: 4,
         }}>
-          {v?.icon ?? '✏️'} {el.label}
+          {v?.icon ?? <Edit3Icon size={10} color="#fff" />} {el.label}
         </div>
       )}
     </div>
@@ -181,7 +216,9 @@ function PropPanel({
 }) {
   if (!el) return (
     <div style={{ padding: '32px 16px', textAlign: 'center', color: 'var(--text-3)' }}>
-      <div style={{ fontSize: '36px', marginBottom: '10px' }}>👆</div>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+        <TargetIcon size={36} color="var(--text-3)" />
+      </div>
       <div style={{ fontSize: '13px' }}>Klik elemen di canvas untuk mengedit</div>
     </div>
   );
@@ -197,7 +234,10 @@ function PropPanel({
       {/* Custom element: editable free text */}
       {el.kind === 'custom' && (
         <div className="field">
-          <label className="label">✏️ Teks Kustom</label>
+          <label className="label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Edit3Icon size={13} color="var(--primary)" />
+            Teks Kustom
+          </label>
           <input
             id="prop-freetext"
             type="text"
@@ -235,8 +275,8 @@ function PropPanel({
             <div style={{ display: 'flex', gap: 6 }}>
               {(['left', 'center', 'right'] as const).map(a => (
                 <button key={a} id={`prop-align-${a}`} onClick={() => onChange({ align: a })}
-                  className={`btn btn-sm ${el.align === a ? 'btn-primary' : 'btn-secondary'}`} style={{ flex: 1 }}>
-                  {a === 'left' ? '⬅' : a === 'center' ? '↔' : '➡'}
+                  className={`btn btn-sm ${el.align === a ? 'btn-primary' : 'btn-secondary'}`} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {a === 'left' ? <AlignLeftIcon size={14} /> : a === 'center' ? <AlignCenterIcon size={14} /> : <AlignRightIcon size={14} />}
                 </button>
               ))}
             </div>
@@ -267,9 +307,10 @@ function PropPanel({
               letterSpacing: '0.07em',
               display: 'flex',
               alignItems: 'center',
-              gap: 5,
+              gap: 6,
             }}>
-              <span>👁️</span> Preview Langsung
+              <EyeIcon size={13} color="var(--primary)" />
+              <span>Preview Langsung</span>
             </div>
             <div style={{
               padding: '14px 12px',
@@ -310,7 +351,10 @@ function PropPanel({
           </div>
         ))}
       </div>
-      <button id="prop-delete" className="btn btn-red btn-sm" onClick={onDelete}>🗑️ Hapus Elemen</button>
+      <button id="prop-delete" className="btn btn-red btn-sm" onClick={onDelete} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+        <TrashIcon size={14} />
+        Hapus Elemen
+      </button>
     </div>
   );
 }
@@ -626,13 +670,11 @@ export default function WizardPage() {
   // ── Download sample CSV ──
   const downloadSample = () => {
     const vars = els.filter(e => e.kind !== 'qr_code').map(e => e.kind);
-    const cols = [
-      ...new Set([
-        ...(vars.includes('nama') ? ['Nama_Penerima'] : []),
-        ...(vars.includes('tanggal') ? ['Tanggal_Sertifikat'] : []),
-        ...(vars.includes('id_sertifikat') ? ['Nomor_Sertifikat'] : []),
-      ]),
-    ];
+    const cols = Array.from(new Set([
+      ...(vars.includes('nama') ? ['Nama_Penerima'] : []),
+      ...(vars.includes('tanggal') ? ['Tanggal_Sertifikat'] : []),
+      ...(vars.includes('id_sertifikat') ? ['Nomor_Sertifikat'] : []),
+    ]));
     const rows = [
       cols.join(','),
       ...Array.from({ length: 5 }, (_, i) => cols.map((c, j) => {
@@ -651,7 +693,7 @@ export default function WizardPage() {
     cancelRef.current = false;
     const total = csvRows.length;
     const wCount = Math.min(Math.max(2, navigator.hardwareConcurrency || 4), 8);
-    const logs: string[] = [`[${ts()}] 🚀 Memulai ${total} sertifikat dengan ${wCount} workers...`];
+    const logs: string[] = [`[${ts()}] [START] Memulai ${total} sertifikat dengan ${wCount} workers...`];
     setProg({ total, done: 0, failed: 0, speed: 0, workers: wCount, etaMs: 0, logs, status: 'running' });
     setZipBlob(null);
 
@@ -739,7 +781,7 @@ export default function WizardPage() {
       const done = i + 1;
       const speed = Math.round(done / elapsed);
       const eta = speed > 0 ? ((total - done) / speed) * 1000 : 0;
-      logs.push(`[${ts()}] [Worker ${(i % wCount) + 1}] ✓ ${fname}.png`);
+      logs.push(`[${ts()}] [Worker ${(i % wCount) + 1}] [OK] ${fname}.png`);
 
       setProg({ total, done, failed: 0, speed, workers: wCount, etaMs: eta, logs: logs.slice(-60), status: 'running' });
 
@@ -748,11 +790,11 @@ export default function WizardPage() {
     }
 
     if (cancelRef.current) {
-      setProg(p => ({ ...p, status: 'cancelled', logs: [...p.logs, `[${ts()}] ⚠️ Dibatalkan.`] }));
+      setProg(p => ({ ...p, status: 'cancelled', logs: [...p.logs, `[${ts()}] [CANCEL] Dibatalkan oleh pengguna.`] }));
       return;
     }
 
-    logs.push(`[${ts()}] 📦 Mengkompres ${results.length} file ke ZIP...`);
+    logs.push(`[${ts()}] [ZIP] Mengkompres ${results.length} file ke ZIP...`);
     setProg(p => ({ ...p, logs: logs.slice(-60) }));
 
     const zip = new JSZip();
@@ -761,7 +803,7 @@ export default function WizardPage() {
     setZipBlob(zb);
 
     const execMs = Date.now() - t0;
-    logs.push(`[${ts()}] ✅ Selesai! ${results.length} sertifikat dalam ${(execMs / 1000).toFixed(1)}s. Siap diunduh!`);
+    logs.push(`[${ts()}] [DONE] Selesai! ${results.length} sertifikat dalam ${(execMs / 1000).toFixed(1)}s. Siap diunduh.`);
     setProg({ total: results.length, done: results.length, failed: 0, speed: Math.round(results.length / (execMs / 1000)), workers: 0, etaMs: 0, logs: logs.slice(-60), status: 'done' });
 
     // ── Simpan riwayat batch ke IndexedDB ──
@@ -804,7 +846,10 @@ export default function WizardPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Langkah 2 dari 4</span>
             <span style={{ color: 'var(--border)' }}>•</span>
-            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>🎯 Atur Posisi Elemen</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <TargetIcon size={15} color="var(--purple)" />
+              Atur Posisi Elemen
+            </span>
           </div>
 
           {/* Template info */}
@@ -893,8 +938,9 @@ export default function WizardPage() {
 
             {/* Tip */}
             <div style={{ marginTop: 'auto', padding: '12px 10px' }}>
-              <div style={{ background: 'var(--primary-light)', borderRadius: 'var(--r-md)', padding: '10px 12px', fontSize: 11, color: 'var(--primary)', lineHeight: 1.5 }}>
-                💡 Klik tombol di atas, lalu <strong>drag</strong> elemen ke posisi yang tepat.
+              <div style={{ background: 'var(--primary-light)', borderRadius: 'var(--r-md)', padding: '10px 12px', fontSize: 11, color: 'var(--primary)', lineHeight: 1.5, display: 'flex', alignItems: 'flex-start', gap: 6 }}>
+                <LightbulbIcon size={14} color="var(--primary)" style={{ flexShrink: 0, marginTop: 2 }} />
+                <span>Klik tombol di atas, lalu <strong>drag</strong> elemen ke posisi yang tepat.</span>
               </div>
             </div>
           </div>
@@ -979,12 +1025,15 @@ export default function WizardPage() {
           <div className="step-panel fade-in">
             <div className="step-header">
               <div className="step-num">Langkah 1 dari 4</div>
-              <h1 className="step-title">📁 Upload Template Sertifikat</h1>
+              <h1 className="step-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <FolderIcon size={24} color="var(--primary)" />
+                Upload Template Sertifikat
+              </h1>
               <p className="step-desc">Upload gambar template sertifikat Anda. Bisa dibuat di Canva, PowerPoint, atau aplikasi desain lainnya.</p>
             </div>
             <div className="step-body">
-              <div className="tip tip-blue" style={{ marginBottom: 24 }}>
-                <span style={{ fontSize: 18 }}>💡</span>
+              <div className="tip tip-blue" style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+                <LightbulbIcon size={20} color="var(--primary)" style={{ flexShrink: 0, marginTop: 2 }} />
                 <div>
                   <strong>Format yang didukung:</strong> PNG, JPG/JPEG<br />
                   <strong>Ukuran rekomendasi:</strong> A4 Landscape: 3508×2480px • A4 Portrait: 2480×3508px<br />
@@ -1006,7 +1055,9 @@ export default function WizardPage() {
                       if (f) handleTplFile(f);
                     }}
                   >
-                    <div className="dz-icon">🖼️</div>
+                    <div className="dz-icon" style={{ display: 'flex', justifyContent: 'center' }}>
+                      <UploadCloudIcon size={52} color="var(--primary)" strokeWidth={1.8} />
+                    </div>
                     <div className="dz-title">Drag & Drop gambar di sini</div>
                     <div className="dz-sub">atau klik untuk pilih file dari komputer</div>
                     <div className="dz-accepted">PNG, JPG • Maks. 50 MB</div>
@@ -1015,8 +1066,9 @@ export default function WizardPage() {
                   {savedTemplates.length > 0 && (
                     <div style={{ marginTop: 28 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)' }}>
-                          🗂️ Atau Pilih dari Template Tersimpan ({savedTemplates.length})
+                        <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <FolderIcon size={18} color="var(--primary)" />
+                          Atau Pilih dari Template Tersimpan ({savedTemplates.length})
                         </div>
                         <Link href="/storage" style={{ fontSize: 13, color: 'var(--primary)', textDecoration: 'none', fontWeight: 600 }}>
                           Kelola Library →
@@ -1057,13 +1109,14 @@ export default function WizardPage() {
                             </div>
                             <button
                               className="btn btn-primary btn-sm"
-                              style={{ width: '100%', marginTop: 'auto' }}
+                              style={{ width: '100%', marginTop: 'auto', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                               onClick={e => {
                                 e.stopPropagation();
                                 selectTemplate(t);
                               }}
                             >
-                              ✨ Gunakan Template
+                              <SparklesIcon size={14} />
+                              Gunakan Template
                             </button>
                           </div>
                         ))}
@@ -1079,9 +1132,15 @@ export default function WizardPage() {
                         <img src={tplSrc} alt="Template preview" style={{ width: '100%', display: 'block', maxHeight: 340, objectFit: 'contain', background: '#f1f5f9' }} />
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 12, flexWrap: 'wrap' }}>
-                        <span className="badge badge-green">✓ Template siap digunakan</span>
+                        <span className="badge badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                          <CheckIcon size={13} />
+                          Template siap digunakan
+                        </span>
                         {tplId && savedTemplates.some(st => st.id === tplId) && (
-                          <span className="badge badge-blue">🗂️ Dari Library</span>
+                          <span className="badge badge-blue" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            <FolderIcon size={12} />
+                            Dari Library
+                          </span>
                         )}
                         <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{tplName} • {tplDim.w}×{tplDim.h}px</span>
                       </div>
@@ -1089,14 +1148,17 @@ export default function WizardPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flexShrink: 0 }}>
                       <button id="change-tpl-btn" className="btn btn-secondary" onClick={() => {
                         setTplSrc(null); setTplBlob(null); setTplName(''); setTplId('');
-                      }}>
-                        🔄 Ganti / Pilih Lain
+                      }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <RefreshCwIcon size={14} />
+                        Ganti / Pilih Lain
                       </button>
-                      <button className="btn btn-secondary btn-sm" onClick={() => fileRef.current?.click()}>
-                        📁 Upload Gambar Baru
+                      <button className="btn btn-secondary btn-sm" onClick={() => fileRef.current?.click()} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <UploadCloudIcon size={14} />
+                        Upload Gambar Baru
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={() => { setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); }}>
-                        🗑️ Hapus
+                      <button className="btn btn-ghost btn-sm" onClick={() => { setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                        <TrashIcon size={14} />
+                        Hapus
                       </button>
                     </div>
                   </div>
@@ -1145,7 +1207,10 @@ export default function WizardPage() {
           <div className="step-panel fade-in">
             <div className="step-header">
               <div className="step-num">Langkah 3 dari 4</div>
-              <h2 className="step-title">📊 Import Data CSV</h2>
+              <h2 className="step-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <BarChartIcon size={24} color="var(--green)" />
+                Import Data CSV
+              </h2>
               <p className="step-desc">Upload file CSV berisi daftar penerima, lalu petakan kolom ke variabel template.</p>
             </div>
             <div className="step-body" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -1155,8 +1220,9 @@ export default function WizardPage() {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                   <div style={{ fontSize: 14, fontWeight: 700 }}>1. Upload File CSV</div>
                   {els.length > 0 && (
-                    <button id="download-sample-csv-btn" className="btn btn-secondary btn-sm" onClick={downloadSample}>
-                      📥 Download Template CSV
+                    <button id="download-sample-csv-btn" className="btn btn-secondary btn-sm" onClick={downloadSample} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <DownloadIcon size={14} />
+                      Download Template CSV
                     </button>
                   )}
                 </div>
@@ -1170,15 +1236,21 @@ export default function WizardPage() {
                       const f = e.dataTransfer.files[0]; if (f) handleCsv(f);
                     }}
                     style={{ padding: '32px 24px' }}>
-                    <div className="dz-icon">📄</div>
+                    <div className="dz-icon" style={{ display: 'flex', justifyContent: 'center' }}>
+                      <FileTextIcon size={48} color="var(--green)" strokeWidth={1.8} />
+                    </div>
                     <div className="dz-title">Drag & Drop file CSV di sini</div>
                     <div className="dz-sub">atau klik untuk pilih file • .csv</div>
                   </div>
                 ) : (
-                  <div className="tip tip-green" style={{ justifyContent: 'space-between' }}>
-                    <div>✅ <strong>{csvName}</strong> — {csvRows.length.toLocaleString()} baris data berhasil dimuat</div>
-                    <button className="btn btn-sm btn-secondary" onClick={() => { setCsvRows([]); setCsvHeaders([]); setCsvName(''); }}>
-                      🔄 Ganti
+                  <div className="tip tip-green" style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <CheckCircleIcon size={18} color="var(--green)" />
+                      <span><strong>{csvName}</strong> — {csvRows.length.toLocaleString()} baris data berhasil dimuat</span>
+                    </div>
+                    <button className="btn btn-sm btn-secondary" onClick={() => { setCsvRows([]); setCsvHeaders([]); setCsvName(''); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                      <RefreshCwIcon size={12} />
+                      Ganti
                     </button>
                   </div>
                 )}
@@ -1240,15 +1312,18 @@ export default function WizardPage() {
                     <div className="label" style={{ marginBottom: 8 }}>Format Ekspor</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                       {[
-                        { v: 'ZIP-PNG' as ExportFmt, ico: '🖼️', t: 'ZIP — PNG Individual', s: 'Tiap sertifikat = 1 file gambar .png' },
-                        { v: 'ZIP-PDF' as ExportFmt, ico: '📄', t: 'ZIP — PDF Individual', s: 'Tiap sertifikat = 1 file .pdf terpisah' },
-                        { v: 'SINGLE-PDF' as ExportFmt, ico: '📑', t: 'PDF Multi-halaman', s: 'Semua sertifikat dalam 1 file PDF' },
+                        { v: 'ZIP-PNG' as ExportFmt, icon: <ImageIcon size={18} color="var(--primary)" />, t: 'ZIP — PNG Individual', s: 'Tiap sertifikat = 1 file gambar .png' },
+                        { v: 'ZIP-PDF' as ExportFmt, icon: <FileTextIcon size={18} color="var(--purple)" />, t: 'ZIP — PDF Individual', s: 'Tiap sertifikat = 1 file .pdf terpisah' },
+                        { v: 'SINGLE-PDF' as ExportFmt, icon: <FilesIcon size={18} color="var(--amber)" />, t: 'PDF Multi-halaman', s: 'Semua sertifikat dalam 1 file PDF' },
                       ].map(opt => (
                         <label key={opt.v} className={`radio-opt ${exportFmt === opt.v ? 'checked' : ''}`}>
                           <input type="radio" name="fmt" value={opt.v} checked={exportFmt === opt.v}
                             id={`fmt-${opt.v}`} onChange={() => setExportFmt(opt.v)} />
                           <div>
-                            <div className="radio-opt-title">{opt.ico} {opt.t}</div>
+                            <div className="radio-opt-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              {opt.icon}
+                              <span>{opt.t}</span>
+                            </div>
                             <div className="radio-opt-sub">{opt.s}</div>
                           </div>
                         </label>
@@ -1285,8 +1360,10 @@ export default function WizardPage() {
               <button className="btn btn-secondary" onClick={() => setStep(2)}>← Kembali</button>
               <button id="step3-next-btn" className="btn btn-primary btn-lg"
                 onClick={() => { setStep(4); generate(); }}
-                disabled={csvRows.length === 0}>
-                ⚡ Mulai Generate {csvRows.length > 0 ? `(${csvRows.length.toLocaleString()})` : ''} →
+                disabled={csvRows.length === 0}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <ZapIcon size={18} />
+                Mulai Generate {csvRows.length > 0 ? `(${csvRows.length.toLocaleString()})` : ''} →
               </button>
             </div>
           </div>
@@ -1297,7 +1374,10 @@ export default function WizardPage() {
           <div className="step-panel fade-in">
             <div className="step-header">
               <div className="step-num">Langkah 4 dari 4</div>
-              <h2 className="step-title">⚡ Generate & Download</h2>
+              <h2 className="step-title" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <ZapIcon size={24} color="var(--amber)" />
+                Generate & Download
+              </h2>
               <p className="step-desc">Proses sedang berjalan secara paralel. Pantau progress dan unduh hasilnya.</p>
             </div>
             <div className="step-body" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -1311,11 +1391,11 @@ export default function WizardPage() {
                       background: prog.status === 'running' ? 'var(--primary)' : prog.status === 'done' ? 'var(--green)' : prog.status === 'cancelled' ? 'var(--amber)' : 'var(--text-3)',
                       animation: prog.status === 'running' ? 'pulse 2s infinite' : 'none',
                     }} />
-                    <span style={{ fontSize: 15, fontWeight: 700, color: prog.status === 'done' ? 'var(--green)' : prog.status === 'running' ? 'var(--primary)' : 'var(--text-2)' }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: prog.status === 'done' ? 'var(--green)' : prog.status === 'running' ? 'var(--primary)' : 'var(--text-2)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                       {prog.status === 'idle' ? 'Mempersiapkan...' :
                         prog.status === 'running' ? 'Sedang memproses...' :
-                          prog.status === 'done' ? '✅ Selesai!' :
-                            prog.status === 'cancelled' ? '⚠️ Dibatalkan' : '❌ Error'}
+                          prog.status === 'done' ? <><CheckCircleIcon size={16} color="var(--green)" /> Selesai!</> :
+                            prog.status === 'cancelled' ? <><AlertTriangleIcon size={16} color="var(--amber)" /> Dibatalkan</> : <><XCircleIcon size={16} color="var(--red)" /> Error</>}
                     </span>
                   </div>
                   <span style={{ fontSize: 32, fontWeight: 900, color: 'var(--text)', fontVariantNumeric: 'tabular-nums' }}>{pct}%</span>
@@ -1334,14 +1414,17 @@ export default function WizardPage() {
               {/* Console */}
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700 }}>📟 Log Pemrosesan</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <TerminalIcon size={15} color="var(--primary)" />
+                    Log Pemrosesan
+                  </div>
                   <span style={{ fontSize: 11, color: 'var(--text-3)' }}>{prog.logs.length} entri</span>
                 </div>
                 <div ref={consoleRef} className="console" id="gen-console">
                   {prog.logs.length === 0
                     ? <span className="cl info">{'> Mempersiapkan engine...'}</span>
                     : prog.logs.map((l, i) => (
-                      <div key={i} className={`cl ${l.includes('✓') || l.includes('✅') ? 'ok' : l.includes('✗') || l.includes('❌') ? 'err' : l.includes('🚀') || l.includes('📦') ? 'info' : ''}`}>
+                      <div key={i} className={`cl ${l.includes('[DONE]') || l.includes('[OK]') || l.includes('✓') ? 'ok' : l.includes('[ERROR]') || l.includes('[CANCEL]') ? 'err' : l.includes('[START]') || l.includes('[ZIP]') ? 'info' : ''}`}>
                         {l}
                       </div>
                     ))}
@@ -1352,12 +1435,17 @@ export default function WizardPage() {
               {prog.status === 'done' && zipBlob && (
                 <div className="dl-area">
                   <div>
-                    <div className="dl-area-t">🎉 {prog.done.toLocaleString()} Sertifikat Siap Diunduh!</div>
+                    <div className="dl-area-t" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <CheckCircleIcon size={22} color="var(--green)" />
+                      <span>{prog.done.toLocaleString()} Sertifikat Siap Diunduh!</span>
+                    </div>
                     <div className="dl-area-s">File ZIP berisi semua sertifikat dalam format {exportFmt} • {(zipBlob.size / 1024 / 1024).toFixed(1)} MB</div>
                   </div>
                   <button id="download-zip-btn" className="btn btn-green btn-lg"
-                    onClick={() => saveAs(zipBlob, `CertifyFlow_${new Date().toISOString().slice(0, 10)}.zip`)}>
-                    📦 Unduh ZIP Sekarang
+                    onClick={() => saveAs(zipBlob, `CertifyFlow_${new Date().toISOString().slice(0, 10)}.zip`)}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <PackageIcon size={18} />
+                    Unduh ZIP Sekarang
                   </button>
                 </div>
               )}
@@ -1366,8 +1454,9 @@ export default function WizardPage() {
             <div className="step-footer">
               <div style={{ display: 'flex', gap: 10 }}>
                 {prog.status === 'running' && (
-                  <button id="cancel-btn" className="btn btn-red" onClick={() => { cancelRef.current = true; }}>
-                    ✋ Batalkan
+                  <button id="cancel-btn" className="btn btn-red" onClick={() => { cancelRef.current = true; }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <StopCircleIcon size={16} />
+                    Batalkan
                   </button>
                 )}
                 {(prog.status === 'done' || prog.status === 'cancelled' || prog.status === 'error') && (
@@ -1377,8 +1466,9 @@ export default function WizardPage() {
                 )}
               </div>
               {prog.status === 'done' && (
-                <button className="btn btn-secondary" onClick={() => { setStep(1); setEls([]); setCsvRows([]); setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); setProg(p => ({ ...p, status: 'idle', logs: [], done: 0 })); setZipBlob(null); }}>
-                  🔄 Buat Batch Baru
+                <button className="btn btn-secondary" onClick={() => { setStep(1); setEls([]); setCsvRows([]); setTplSrc(null); setTplBlob(null); setTplName(''); setTplId(''); setProg(p => ({ ...p, status: 'idle', logs: [], done: 0 })); setZipBlob(null); }} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <RefreshCwIcon size={15} />
+                  Buat Batch Baru
                 </button>
               )}
             </div>
@@ -1388,8 +1478,9 @@ export default function WizardPage() {
         {/* Help box always visible */}
         <div style={{ marginTop: 24 }}>
           <details style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)', padding: '14px 20px' }}>
-            <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'var(--text-2)', userSelect: 'none' }}>
-              ❓ Butuh bantuan?
+            <summary style={{ cursor: 'pointer', fontWeight: 700, fontSize: 14, color: 'var(--text-2)', userSelect: 'none', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <HelpCircleIcon size={17} color="var(--primary)" />
+              Butuh bantuan?
             </summary>
             <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
               {[
@@ -1399,7 +1490,10 @@ export default function WizardPage() {
                 { q: 'Apakah bisa menggunakan font kustom?', a: 'Saat ini tersedia 10+ font dari Google Fonts. Pilih font di panel Properties setelah menambahkan elemen teks.' },
               ].map(item => (
                 <div key={item.q} style={{ padding: '12px 14px', background: 'var(--elevated)', borderRadius: 'var(--r-md)' }}>
-                  <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)', marginBottom: 4 }}>🔹 {item.q}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <HelpCircleIcon size={14} color="var(--primary)" />
+                    <span>{item.q}</span>
+                  </div>
                   <div style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{item.a}</div>
                 </div>
               ))}

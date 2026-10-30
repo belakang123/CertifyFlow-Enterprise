@@ -157,5 +157,5 @@ export async function mergePdfsToSingle(pdfBytesList: Uint8Array[]): Promise<Blo
     copiedPages.forEach((page) => mergedPdf.addPage(page));
   }
   const mergedBytes = await mergedPdf.save();
-  return new Blob([mergedBytes], { type: 'application/pdf' });
+  return new Blob([mergedBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
 }
