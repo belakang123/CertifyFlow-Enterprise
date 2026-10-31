@@ -34,8 +34,8 @@
 ## 🌟 Fitur Utama
 
 - 🔒 **100% Client-Side & Privasi Penuh** — Seluruh data penerima dan template diproses langsung di browser lokal Anda. Tanpa backend API, tanpa pelacakan, dan aman untuk data sensitif.
-- 🎨 **Visual Canvas Editor** — Drag & drop posisi nama, tanggal, nomor sertifikat unik, teks kustom, dan QR code langsung di atas template gambar.
-- 🔤 **Google Fonts & Tipografi Fleksibel** — Kustomisasi ukuran font, warna, perataan (kiri, tengah, kanan), ketebalan (bold), dan format miring (italic) dengan live preview instan.
+- 🎨 **Visual Canvas Editor** — Drag untuk memindahkan elemen, ubah ukuran lewat handle, atau atur koordinat presisi. Geser dengan tombol panah (Shift + panah untuk 10 px).
+- 🔤 **Google Fonts & Tipografi Fleksibel** — Pilih Inter, Roboto, Open Sans, Montserrat, Poppins, Playfair Display, Merriweather, Dancing Script, Great Vibes, atau Raleway; atur ukuran, warna, rata teks, bold, dan italic dengan preview langsung.
 - 📊 **Import CSV & Pemetaan Kolom Fleksibel** — Upload file CSV berisi ribuan baris, lalu petakan kolom secara visual ke variabel sertifikat. Dilengkapi tombol unduh template CSV contoh.
 - 📦 **Pilihan Ekspor Fleksibel**:
   - `ZIP-PNG` (File gambar individual kualitas tinggi)

@@ -109,26 +109,63 @@ function StepBar({ step }: { step: number }) {
 // ─── ELEMENT OVERLAY ──────────────────────────────────────────────────────────
 // Renders element as live-styled text preview on canvas (like Canva)
 function ElOverlay({
-  el, selected, scale, onClick, onUpdate,
+  el, selected, scale, canvasWidth, canvasHeight, onClick, onUpdate,
 }: {
   el: CanvasEl; selected: boolean; scale: number;
+  canvasWidth: number; canvasHeight: number;
   onClick: () => void; onUpdate: (u: Partial<CanvasEl>) => void;
 }) {
-  const drag = useRef<{ sx: number; sy: number; ox: number; oy: number } | null>(null);
+  const gesture = useRef<{
+    pointerId: number;
+    mode: 'move' | 'resize';
+    startX: number;
+    startY: number;
+    startLeft: number;
+    startTop: number;
+    startWidth: number;
+    startHeight: number;
+  } | null>(null);
   const v = VARS.find(v => v.kind === el.kind);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    e.stopPropagation(); onClick();
-    drag.current = { sx: e.clientX, sy: e.clientY, ox: el.x, oy: el.y };
-    const mm = (ev: MouseEvent) => {
-      if (!drag.current) return;
-      onUpdate({
-        x: Math.round(drag.current.ox + (ev.clientX - drag.current.sx) / scale),
-        y: Math.round(drag.current.oy + (ev.clientY - drag.current.sy) / scale),
-      });
+  const startGesture = (e: React.PointerEvent<HTMLElement>, mode: 'move' | 'resize') => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+    gesture.current = {
+      pointerId: e.pointerId,
+      mode,
+      startX: e.clientX,
+      startY: e.clientY,
+      startLeft: el.x,
+      startTop: el.y,
+      startWidth: el.w,
+      startHeight: el.h,
     };
-    const mu = () => { drag.current = null; window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
-    window.addEventListener('mousemove', mm); window.addEventListener('mouseup', mu);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const active = gesture.current;
+    if (!active || active.pointerId !== e.pointerId) return;
+
+    const deltaX = (e.clientX - active.startX) / scale;
+    const deltaY = (e.clientY - active.startY) / scale;
+    if (active.mode === 'move') {
+      onUpdate({
+        x: Math.max(0, Math.min(canvasWidth - el.w, Math.round(active.startLeft + deltaX))),
+        y: Math.max(0, Math.min(canvasHeight - el.h, Math.round(active.startTop + deltaY))),
+      });
+      return;
+    }
+
+    onUpdate({
+      w: Math.max(24, Math.min(canvasWidth - active.startLeft, Math.round(active.startWidth + deltaX))),
+      h: Math.max(24, Math.min(canvasHeight - active.startTop, Math.round(active.startHeight + deltaY))),
+    });
+  };
+
+  const endGesture = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (gesture.current?.pointerId === e.pointerId) gesture.current = null;
   };
 
   const isQr = el.kind === 'qr_code';
@@ -136,13 +173,17 @@ function ElOverlay({
 
   return (
     <div
-      onMouseDown={onMouseDown}
+      onPointerDown={e => startGesture(e, 'move')}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endGesture}
+      onPointerCancel={endGesture}
+      onClick={e => e.stopPropagation()}
       className={`c-tag ${selected ? 'selected' : ''}`}
       style={{
         left: el.x * scale,
         top: el.y * scale,
-        width: Math.max(el.w * scale, 60),
-        height: Math.max(el.h * scale, isQr ? 60 : 28),
+        width: el.w * scale,
+        height: el.h * scale,
         zIndex: selected ? 20 : 10,
         // Remove default c-tag background for text elements so live preview shows through
         background: isQr ? 'rgba(255,255,255,0.85)' : 'transparent',
@@ -156,6 +197,7 @@ function ElOverlay({
         overflow: 'hidden',
         cursor: 'move',
         userSelect: 'none',
+        touchAction: 'none',
         boxSizing: 'border-box',
       }}
     >
@@ -170,12 +212,11 @@ function ElOverlay({
         <span
           style={{
             fontFamily: `"${el.font}", sans-serif`,
-            fontSize: Math.max(8, el.size * scale) + 'px',
+            fontSize: Math.max(1, el.size * scale) + 'px',
             fontWeight: el.bold ? 700 : 400,
             fontStyle: el.italic ? 'italic' : 'normal',
             color: el.color,
             lineHeight: 1.2,
-            padding: '0 4px',
             overflow: 'hidden',
             whiteSpace: 'nowrap',
             textOverflow: 'ellipsis',
@@ -190,17 +231,40 @@ function ElOverlay({
       )}
       {/* Selection handle badge */}
       {selected && (
-        <div style={{
-          position: 'absolute', top: -20, left: 0,
-          background: 'var(--primary)', color: '#fff',
-          fontSize: 10, fontWeight: 700,
-          padding: '2px 6px', borderRadius: 4,
-          whiteSpace: 'nowrap', lineHeight: 1.4,
-          pointerEvents: 'none',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
-          {v?.icon ?? <Edit3Icon size={10} color="#fff" />} {el.label}
-        </div>
+        <>
+          <div style={{
+            position: 'absolute', top: -20, left: 0,
+            background: 'var(--primary)', color: '#fff',
+            fontSize: 10, fontWeight: 700,
+            padding: '2px 6px', borderRadius: 4,
+            whiteSpace: 'nowrap', lineHeight: 1.4,
+            pointerEvents: 'none',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            {v?.icon ?? <Edit3Icon size={10} color="#fff" />} {el.label} · {el.x}, {el.y}
+          </div>
+          <button
+            type="button"
+            aria-label="Ubah ukuran elemen"
+            title="Tarik untuk mengubah ukuran"
+            onPointerDown={e => startGesture(e, 'resize')}
+            style={{
+              position: 'absolute',
+              right: -1,
+              bottom: -1,
+              width: 10,
+              height: 10,
+              minWidth: 10,
+              minHeight: 10,
+              padding: 0,
+              border: '2px solid #fff',
+              borderRadius: 3,
+              background: 'var(--primary)',
+              cursor: 'nwse-resize',
+              touchAction: 'none',
+            }}
+          />
+        </>
       )}
     </div>
   );
@@ -208,9 +272,11 @@ function ElOverlay({
 
 // ─── PROPERTY PANEL ──────────────────────────────────────────────────────────
 function PropPanel({
-  el, onChange, onDelete,
+  el, canvasWidth, canvasHeight, onChange, onDelete,
 }: {
   el: CanvasEl | null;
+  canvasWidth: number;
+  canvasHeight: number;
   onChange: (u: Partial<CanvasEl>) => void;
   onDelete: () => void;
 }) {
@@ -226,6 +292,18 @@ function PropPanel({
   const previewText = el.kind === 'custom'
     ? (el.freeText || 'Teks kustom...')
     : el.label;
+  const updateGeometry = (key: 'x' | 'y' | 'w' | 'h', value: number) => {
+    if (key === 'x') onChange({ x: value });
+    else if (key === 'y') onChange({ y: value });
+    else if (key === 'w') onChange({ w: value });
+    else onChange({ h: value });
+  };
+  const geometryFields = [
+    { key: 'x' as const, label: 'X (posisi)', max: canvasWidth - el.w },
+    { key: 'y' as const, label: 'Y (posisi)', max: canvasHeight - el.h },
+    { key: 'w' as const, label: 'Lebar', max: canvasWidth - el.x },
+    { key: 'h' as const, label: 'Tinggi', max: canvasHeight - el.y },
+  ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -254,7 +332,7 @@ function PropPanel({
           <div className="field">
             <label className="label">Font</label>
             <select className="select" value={el.font} onChange={e => onChange({ font: e.target.value })} id="prop-font">
-              {FONTS.map(f => <option key={f}>{f}</option>)}
+              {FONTS.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
@@ -343,13 +421,24 @@ function PropPanel({
 
       <div className="e-divider" />
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        {(['x','y','w','h'] as (keyof CanvasEl)[]).map(k => (
-          <div className="field" key={k}>
-            <label className="label">{k.toUpperCase()}</label>
-            <input id={`prop-${k}`} type="number" className="input" value={el[k] as number}
-              onChange={e => onChange({ [k]: +e.target.value })} />
+        {geometryFields.map(field => (
+          <div className="field" key={field.key}>
+            <label className="label" htmlFor={`prop-${field.key}`}>{field.label} (px)</label>
+            <input
+              id={`prop-${field.key}`}
+              type="number"
+              className="input"
+              min={field.key === 'w' || field.key === 'h' ? 24 : 0}
+              max={field.max}
+              step={1}
+              value={el[field.key]}
+              onChange={e => updateGeometry(field.key, e.currentTarget.valueAsNumber)}
+            />
           </div>
         ))}
+      </div>
+      <div style={{ fontSize: 11, color: 'var(--text-3)', lineHeight: 1.5 }}>
+        Gunakan panah keyboard untuk menggeser 1 px, atau Shift + panah untuk 10 px.
       </div>
       <button id="prop-delete" className="btn btn-red btn-sm" onClick={onDelete} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
         <TrashIcon size={14} />
@@ -457,15 +546,17 @@ export default function WizardPage() {
           else if (e.variableName === '{{qr_code}}' || e.type === 'qrcode') kind = 'qr_code';
           else kind = 'custom';
 
+          const width = Math.max(1, Math.min(t.dimensions.width, e.width));
+          const height = Math.max(1, Math.min(t.dimensions.height, e.height));
           return {
             id: e.id || uuid(),
             kind,
             label: e.variableName,
             freeText: kind === 'custom' ? e.variableName : undefined,
-            x: e.x,
-            y: e.y,
-            w: e.width,
-            h: e.height,
+            x: Math.max(0, Math.min(t.dimensions.width - width, e.x)),
+            y: Math.max(0, Math.min(t.dimensions.height - height, e.y)),
+            w: width,
+            h: height,
             font: e.fontFamily || 'Inter',
             size: e.fontSize || 42,
             color: e.fontColor || '#000000',
@@ -522,7 +613,11 @@ export default function WizardPage() {
     };
     // Delay agar DOM sudah render sebelum diukur
     const t = setTimeout(fitScale, 60);
-    return () => clearTimeout(t);
+    window.addEventListener('resize', fitScale);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('resize', fitScale);
+    };
   }, [step, tplDim, manualScale]);
 
   // Step 3: CSV
@@ -620,21 +715,59 @@ export default function WizardPage() {
   const addEl = (kind: CanvasEl['kind'], customLabel?: string, customText?: string) => {
     const v = VARS.find(v => v.kind === kind);
     const label = customLabel ?? v?.label ?? 'Elemen';
+    const w = Math.min(kind === 'qr_code' ? 130 : 350, tplDim.w);
+    const h = Math.min(kind === 'qr_code' ? 130 : 52, tplDim.h);
     const el: CanvasEl = {
       id: uuid(), kind,
       label,
       freeText: kind === 'custom' ? (customText ?? customLabel ?? 'Teks Kustom') : undefined,
-      x: 80, y: els.length * 80 + 80,
-      w: kind === 'qr_code' ? 130 : 350, h: kind === 'qr_code' ? 130 : 52,
+      x: Math.min(80, tplDim.w - w),
+      y: Math.min(els.length * 80 + 80, tplDim.h - h),
+      w, h,
       font: 'Inter', size: 42, color: '#000000',
       bold: false, italic: false, align: 'center',
     };
     setEls(p => [...p, el]); setSelId(el.id);
   };
   const updEl = useCallback((id: string, u: Partial<CanvasEl>) => {
-    setEls(p => p.map(e => e.id === id ? { ...e, ...u } : e));
-  }, []);
+    setEls(p => p.map(e => {
+      if (e.id !== id) return e;
+      const next = { ...e, ...u };
+      const minSize = 24;
+      const w = Math.max(minSize, Math.min(tplDim.w, Number.isFinite(next.w) ? next.w : e.w));
+      const h = Math.max(minSize, Math.min(tplDim.h, Number.isFinite(next.h) ? next.h : e.h));
+      return {
+        ...next,
+        w,
+        h,
+        x: Math.max(0, Math.min(tplDim.w - w, Number.isFinite(next.x) ? next.x : e.x)),
+        y: Math.max(0, Math.min(tplDim.h - h, Number.isFinite(next.y) ? next.y : e.y)),
+      };
+    }));
+  }, [tplDim]);
   const delEl = () => { setEls(p => p.filter(e => e.id !== selId)); setSelId(null); };
+
+  useEffect(() => {
+    if (step !== 2 || !selId) return;
+    const handleArrowKeys = (event: KeyboardEvent) => {
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable || target.matches('input, textarea, select'))
+      ) return;
+      const delta = event.shiftKey ? 10 : 1;
+      const changes: Partial<CanvasEl> = {};
+      if (event.key === 'ArrowLeft') changes.x = (selEl?.x ?? 0) - delta;
+      else if (event.key === 'ArrowRight') changes.x = (selEl?.x ?? 0) + delta;
+      else if (event.key === 'ArrowUp') changes.y = (selEl?.y ?? 0) - delta;
+      else if (event.key === 'ArrowDown') changes.y = (selEl?.y ?? 0) + delta;
+      else return;
+      event.preventDefault();
+      updEl(selId, changes);
+    };
+    window.addEventListener('keydown', handleArrowKeys);
+    return () => window.removeEventListener('keydown', handleArrowKeys);
+  }, [step, selId, selEl, updEl]);
 
   // ── Step 3: CSV ──
   const handleCsv = (file: File) => {
@@ -686,6 +819,16 @@ export default function WizardPage() {
     const logs: string[] = [`[${ts()}] [START] Memulai ${total} sertifikat dengan ${wCount} workers...`];
     setProg({ total, done: 0, failed: 0, speed: 0, workers: wCount, etaMs: 0, logs, status: 'running' });
     setZipBlob(null);
+
+    const fontFaces = Array.from(new Set(els
+      .filter(el => el.kind !== 'qr_code')
+      .map(el => [
+        el.italic ? 'italic' : '',
+        el.bold ? 'bold' : '',
+        `${el.size}px`,
+        `"${el.font}", sans-serif`,
+      ].filter(Boolean).join(' '))));
+    await Promise.all(fontFaces.map(font => document.fonts.load(font)));
 
     const results: { name: string; blob: Blob }[] = [];
     const t0 = Date.now();
@@ -750,8 +893,8 @@ export default function WizardPage() {
           ctx.font = fStyle;
           ctx.fillStyle = el.color;
           ctx.textAlign = el.align;
-          ctx.textBaseline = 'top';
-          ctx.fillText(text, tx, el.y, el.w);
+          ctx.textBaseline = 'middle';
+          ctx.fillText(text, tx, el.y + el.h / 2, el.w);
         } else {
           // Variable text resolved from CSV row
           const text = resolved[el.kind] ?? '';
@@ -759,8 +902,8 @@ export default function WizardPage() {
           ctx.font = fStyle;
           ctx.fillStyle = el.color;
           ctx.textAlign = el.align;
-          ctx.textBaseline = 'top';
-          ctx.fillText(text, tx, el.y, el.w);
+          ctx.textBaseline = 'middle';
+          ctx.fillText(text, tx, el.y + el.h / 2, el.w);
         }
       }
 
@@ -827,9 +970,9 @@ export default function WizardPage() {
         </Head>
 
         {/* Top Chrome Bar */}
-        <div style={{
+        <div className="wizard-editor-chrome" style={{
           position: 'sticky', top: 60, zIndex: 50,
-          height: 52, background: 'var(--surface)',
+          background: 'var(--surface)',
           borderBottom: '1px solid var(--border)',
           display: 'flex', alignItems: 'center',
           padding: '0 16px', gap: 12,
@@ -880,12 +1023,7 @@ export default function WizardPage() {
         </div>
 
         {/* Full-screen editor */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '210px 1fr 270px',
-          height: 'calc(100vh - 60px - 52px)', // viewport - navbar - chrome bar
-          overflow: 'hidden',
-        }}>
+        <div className="wizard-editor-grid">
           {/* ── Left Sidebar: Tools ── */}
           <div className="e-sidebar">
             <div className="e-section">Tambah Elemen</div>
@@ -913,6 +1051,10 @@ export default function WizardPage() {
             <div style={{ padding: '4px 10px' }}>
               <button id="zoom-fit-sb" className="btn btn-ghost btn-sm" style={{ width: '100%', fontSize: 10 }}
                 onClick={() => setManualScale(false)}>⊡ Auto-fit</button>
+            </div>
+            <div style={{ padding: '4px 10px', fontSize: 10, lineHeight: 1.5, color: 'var(--text-3)' }}>
+              Tarik elemen untuk memindahkan. Tarik sudut kanan bawah untuk mengubah ukuran.
+              Gunakan tombol panah untuk posisi presisi.
             </div>
 
             {els.length > 0 && <>
@@ -985,6 +1127,8 @@ export default function WizardPage() {
                     key={e.id} el={e}
                     selected={selId === e.id}
                     scale={scale}
+                    canvasWidth={tplDim.w}
+                    canvasHeight={tplDim.h}
                     onClick={() => setSelId(e.id)}
                     onUpdate={u => updEl(e.id, u)}
                   />
@@ -995,7 +1139,13 @@ export default function WizardPage() {
 
           {/* ── Right Sidebar: Properties ── */}
           <div className="e-props">
-            <PropPanel el={selEl} onChange={u => selId && updEl(selId, u)} onDelete={delEl} />
+            <PropPanel
+              el={selEl}
+              canvasWidth={tplDim.w}
+              canvasHeight={tplDim.h}
+              onChange={u => selId && updEl(selId, u)}
+              onDelete={delEl}
+            />
           </div>
         </div>
       </>
