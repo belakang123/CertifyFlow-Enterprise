@@ -13,6 +13,12 @@
   Buat ratusan hingga ribuan sertifikat personal dalam hitungan detik. Upload template PNG/JPG, import CSV data penerima, atur posisi elemen visual dengan drag & drop, dan ekspor langsung ke file ZIP atau PDF multi-halaman tanpa mengirim data ke server manapun.
 </p>
 
+<p align="center">
+  <a href="https://certifyflow.exatemplate.com/" target="_blank" rel="noopener noreferrer">
+    🌐 Kunjungi Web CertifyFlow
+  </a>
+</p>
+
 </div>
 
 <div align="center">
